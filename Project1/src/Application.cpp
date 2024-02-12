@@ -155,11 +155,10 @@ int main(void){
 
     unsigned int buffer; 
     GLCALL(glGenBuffers(1, &buffer));
-    GLCALL(glBindBuffer(GL_ARRAY_BUFFER, buffer);)
+    GLCALL(glBindBuffer(GL_ARRAY_BUFFER, buffer));
     GLCALL(glBufferData(GL_ARRAY_BUFFER, 4 * 2 * sizeof(float), positions, GL_STATIC_DRAW)); 
     GLCALL(glEnableVertexAttribArray(0));
     GLCALL(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0));
-    GLCALL(glBindBuffer(GL_ARRAY_BUFFER,0));
 
     unsigned int ibo;
     GLCALL(glGenBuffers(1, &ibo));
@@ -176,7 +175,7 @@ int main(void){
     unsigned int shader = CreateShader(source.VertexSource, source.FragmentSource);
     GLCALL(glUseProgram(shader));
 
-    
+    // change color using global var u_Color
     GLCALL(int location = glGetUniformLocation(shader, "u_Color"));
     ASSERT(location != -1);
 
