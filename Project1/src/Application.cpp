@@ -9,7 +9,7 @@
 #include "Renderer.h"
 #include "IndexBuffer.h"
 #include "VertexBuffer.h"
-
+#include "VertexArray.h"
 
 struct ShaderProgramSource {
     std::string VertexSource;
@@ -74,7 +74,6 @@ static unsigned int CompileShader( unsigned int type, const std::string& source)
     return id;
 }
 
-
 static unsigned int CreateShader(const std::string& vertexShader, const std::string & fragmentShader) {
     
     GLCALL(unsigned int program = glCreateProgram());
@@ -108,7 +107,7 @@ int main(void){
 
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(640, 480, "OpenGL Tutorial", NULL, NULL);
     if (!window){
         glfwTerminate();
         return -1;
@@ -139,18 +138,17 @@ int main(void){
             0, 1, 2,
             2, 3, 0
         };
-
-        // vertex array object 
-        unsigned int vao;
-        GLCALL(glGenVertexArrays(1, &vao));
-        GLCALL(glBindVertexArray(vao));
+        
+        // vertexArray
+        VertexArray va;
 
         // buffer
         VertexBuffer vb(positions, 4 * 2 * sizeof(float));  // already bound
-    
-        // vertex array
-        GLCALL(glEnableVertexAttribArray(0));
-        GLCALL(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0));
+
+        // vertexBufferLayout
+        VertexBufferLayout layout;
+        layout.Push<float>(2);
+        va.AddBuffer(vb, layout);
 
         // indices
         IndexBuffer ib(indices, 6);
@@ -173,7 +171,8 @@ int main(void){
 
 
         // clear gl states
-        GLCALL(glBindVertexArray(0));
+        va.Unbind();
+        vb.Unbind();
         GLCALL(glUseProgram(0));
         GLCALL(glBindBuffer(GL_ARRAY_BUFFER, 0));
         GLCALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
@@ -190,7 +189,7 @@ int main(void){
             GLCALL(glUseProgram(shader));
             GLCALL(glUniform4f(location, r, 0.3f, 1.0f, 1.0f));
 
-            GLCALL(glBindVertexArray(vao));
+            va.Bind();
             ib.Bind();
 
             GLCALL( glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr) );
