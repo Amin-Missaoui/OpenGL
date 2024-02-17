@@ -11,6 +11,7 @@
 #include "VertexBuffer.h"
 #include "VertexArray.h"
 #include "Shader.h"
+#include "Texture.h"
 
 int main(void){
     
@@ -47,10 +48,10 @@ int main(void){
         // after glfwTerminate()
     { 
         float positions[] = {
-            -0.5f, -0.5f,
-             0.5f, -0.5f,
-             0.5f,  0.5f,
-             -0.5f, 0.5f,
+            -0.5f, -0.5f, 0.0f, 0.0f,
+             0.5f, -0.5f, 1.0f, 0.0f,
+             0.5f,  0.5f, 1.0f, 1.0f,
+             -0.5f, 0.5f, 0.0f, 1.0f
         };
 
         unsigned int indices[] = {
@@ -58,14 +59,19 @@ int main(void){
             2, 3, 0
         };
         
+        // Enable texture blending
+        GLCALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+        GLCALL(glEnable(GL_BLEND));
+
         // vertexArray
         VertexArray va;
 
         // buffer
-        VertexBuffer vb(positions, 4 * 2 * sizeof(float));  // already bound
+        VertexBuffer vb(positions, 4 * 4 * sizeof(float));  // already bound
 
         // vertexBufferLayout
         VertexBufferLayout layout;
+        layout.Push<float>(2);
         layout.Push<float>(2);
         va.AddBuffer(vb, layout);
 
@@ -78,6 +84,11 @@ int main(void){
         // change color using global var u_Color
 
         shader.SetUniform4f("u_Color", 0.1f, 0.3f, 1.0f, 1.0f);
+
+
+        Texture texture("res/Textures/texture.png");
+        texture.Bind(); // default is 0
+        shader.SetUniform1i("u_Texture", 0);
 
         // clear gl states
         va.Unbind();
