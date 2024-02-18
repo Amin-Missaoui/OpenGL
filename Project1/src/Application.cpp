@@ -1,5 +1,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 
 #include <iostream>
 #include <fstream>
@@ -59,7 +62,7 @@ int main(void){
             2, 3, 0
         };
         
-        // Enable texture blending
+        // enable texture blending
         GLCALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
         GLCALL(glEnable(GL_BLEND));
 
@@ -78,6 +81,13 @@ int main(void){
         // indices
         IndexBuffer ib(indices, 6);
    
+        // projection matrix
+
+        glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f);
+
+
+
+
         // shaders
         Shader shader("res/shaders/Shader.shader");
         shader.Bind();
@@ -85,10 +95,14 @@ int main(void){
 
         shader.SetUniform4f("u_Color", 0.1f, 0.3f, 1.0f, 1.0f);
 
-
+        // load textures
         Texture texture("res/Textures/texture.png");
         texture.Bind(); // default is 0
+
+        // set uniforms
         shader.SetUniform1i("u_Texture", 0);
+        shader.SetUniformMat4f("u_MVP", proj);
+
 
         // clear gl states
         va.Unbind();
